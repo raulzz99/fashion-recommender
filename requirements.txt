@@ -1,0 +1,17 @@
+# ----- Core -----
+numpy<2
+pillow>=10,<12
+tqdm>=4.66
+streamlit>=1.33,<1.39
+
+# ----- ONNX stack -----
+onnx==1.16.2
+onnxruntime>=1.18,<1.20
+
+# ----- FAISS (CPU) -----
+faiss-cpu==1.8.0.post1
+
+# ----- PyTorch (CPU-only wheels) -----
+torch
+torchvision
+--extra-index-url https://download.pytorch.org/whl/cpu
