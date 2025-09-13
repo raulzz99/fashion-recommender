@@ -1,4 +1,4 @@
-# 📸 Simple Image Recommendation App (Streamlit)
+# 📸 Image Recommendation App (Streamlit)
 
 A small demo that lets users upload an image and see "similar" images from a gallery. The app is designed to evolve from a placeholder recommender to a real embedding + FAISS similarity system running **CPU‑only** by default (works great on EC2 without CUDA).
 
@@ -28,6 +28,8 @@ fashion-recommender/
 ├─ artifacts/                        # models & artifacts
 │  └─ fashion_embedder_v1.onnx       # ONNX embedder (copied via scp)
 ├─ index/                            # FAISS index + metadata output (to be generated)
+├─ artifacts/                       # models & artifacts
+│ └─ fashion_embedder_v1.onnx       # ONNX embedder used to generate embeddings
 ├─ requirements.txt                  # Python deps (see below)
 └─ README.md
 ```
@@ -138,7 +140,7 @@ PY
 
 ---
 
-## 🔎 (WIP) Build Gallery Index with FAISS
+## 🔎 Gallery Index with FAISS
 
 Run the helper script to validate paths and load the model (extend it to actually build the index):
 
