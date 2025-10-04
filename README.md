@@ -24,7 +24,8 @@ fashion-recommender/
 ├─ gallery_images/                   # place your dataset here
 │  ├─ img/WOMEN/...                  # DeepFashion-like layout (example)
 │  └─ img/MEN/...
-│  └─ list_eval_partition.txt        # optional eval mapping file
+│  └─ eval/
+│   └─ list_eval_partition.txt
 ├─ artifacts/                        # models & artifacts
 │  └─ fashion_embedder_v1.onnx       # ONNX embedder (copied via scp)
 ├─ index/                            # FAISS index + metadata output (to be generated)
