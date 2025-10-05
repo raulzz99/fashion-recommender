@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os
+import os, re
 import argparse
 import json
 import time
@@ -390,7 +390,21 @@ def run_small_scale_tune(args):
     import ray
     from ray import air, tune
     from ray.tune.schedulers import ASHAScheduler
+    from urllib.parse import urlparse
+    
+    
+    # --- normalize storage path to a proper URI Ray/pyarrow accepts ---
+    def to_uri(p: str) -> str:
+        parsed = urlparse(p)
+        if parsed.scheme:            # already file://, s3://, gs://, etc.
+            return p
+        return "file://" + os.path.abspath(p)
 
+    storage_uri = to_uri(args.ray_dir)
+    os.makedirs(os.path.abspath(args.ray_dir), exist_ok=True)
+    print(f"[Ray] storage_path -> {storage_uri}")
+
+    
     scheduler = ASHAScheduler(metric=args.ray_metric, mode=args.ray_mode)
     ray.init(ignore_reinit_error=True, include_dashboard=False)
 
@@ -415,22 +429,28 @@ def run_small_scale_tune(args):
         "early_stop_patience": 5,
         "online_mining_start_epoch": 2,
     }
+    
+    # inside run_small_scale_tune(args) before tune.Tuner(...)
+    ray_dir = args.ray_dir
+    if not re.match(r'^\w+://', ray_dir):            # no scheme given
+        ray_dir = f"file://{os.path.abspath(ray_dir)}"
+    os.makedirs(os.path.abspath(args.ray_dir), exist_ok=True)
 
     tuner = tune.Tuner(
         ray_train,
         run_config=air.RunConfig(
             name=args.ray_name,
-            storage_path=args.ray_dir,
+            storage_path=storage_uri,
             checkpoint_config=air.CheckpointConfig(num_to_keep=2),
         ),
         tune_config=tune.TuneConfig(
             scheduler=scheduler,
             num_samples=args.ray_num_samples,
-            metric=args.ray_metric,
-            mode=args.ray_mode,
+            # metric/mode omitted here; scheduler already has them
         ),
         param_space=param_space,
     )
+    
     results = tuner.fit()
     print("Ray Tune finished.")
     try:
